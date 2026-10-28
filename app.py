@@ -88,8 +88,28 @@ if st.button("Predict Wealth Category", type="primary"):
     input_df = input_df[feature_cols]
 
     # Make prediction
-    prediction = model.predict(input_df)[0]
-    prediction_proba = model.predict_proba(input_df)
+if st.button("Predict Wealth Category", type="primary"):
+    # Construct input dataframe matching trained columns
+    input_data = {
+        'Elevationm': elevation,
+        'Latitude': latitude,
+        'Longitude': longitude,
+        'hv201': hv201,
+        'hv206': hv206
+    }
+    
+    input_df = pd.DataFrame([input_data])
+    for col in feature_cols:
+        if col not in input_df.columns:
+            input_df[col] = 0 
+    input_df = input_df[feature_cols]
+
+    # Convert to numeric NumPy array to prevent XGBoost inplace_predict errors
+    X_pred = input_df.astype(float).values
+
+    # Make prediction using the clean array
+    prediction = model.predict(X_pred)[0]
+    prediction_proba = model.predict_proba(X_pred)
     
     wealth_labels = {0: 'Poorest', 1: 'Poorer', 2: 'Middle', 3: 'Richer', 4: 'Richest'}
     predicted_label = wealth_labels.get(prediction, f"Class {prediction}")
@@ -100,3 +120,4 @@ if st.button("Predict Wealth Category", type="primary"):
     st.subheader("Prediction Probabilities across Classes")
     prob_df = pd.DataFrame(prediction_proba, columns=list(wealth_labels.values()))
     st.bar_chart(prob_df.T)
+
