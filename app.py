@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import joblib
@@ -24,7 +23,7 @@ except Exception as e:
     st.error(f"Error loading model files: {e}. Make sure model artifacts are uploaded.")
     st.stop()
 
-# Main page form inputs (matching the clean look from your screenshot)
+# Main page form inputs
 st.markdown("---")
 
 # Mapping dictionary for user-friendly labels to model values
@@ -62,7 +61,7 @@ hv207 = yes_no_options[radio_label]
 tv_label = st.selectbox("Television Available (hv208)", list(yes_no_options.keys()))
 hv208 = yes_no_options[tv_label]
 
-# If your model also uses Elevation/Coordinates, include default/background values or additional inputs:
+# Elevation & Coordinates defaults/inputs
 elevation = st.slider("Elevation (meters)", 500.0, 4000.0, 1500.0)
 latitude = st.number_input("Latitude", value=11.5)
 longitude = st.number_input("Longitude", value=37.3)
@@ -70,25 +69,7 @@ longitude = st.number_input("Longitude", value=37.3)
 st.markdown("---")
 
 # Prediction button
-if st.button("Predict Wealth Category", type="primary"):
-    # Construct input dataframe matching trained columns
-    input_data = {
-        'Elevationm': elevation,
-        'Latitude': latitude,
-        'Longitude': longitude,
-        'hv201': hv201,
-        'hv206': hv206
-    }
-    
-    # Filter or order columns to match what the model expects
-    input_df = pd.DataFrame([input_data])
-    for col in feature_cols:
-        if col not in input_df.columns:
-            input_df[col] = 0 # fallback if extra columns exist
-    input_df = input_df[feature_cols]
-
-    # Make prediction
-if st.button("Predict Wealth Category", type="primary"):
+if st.button("Predict Wealth Category", type="primary", key="predict_button"):
     # Construct input dataframe matching trained columns
     input_data = {
         'Elevationm': elevation,
@@ -120,4 +101,3 @@ if st.button("Predict Wealth Category", type="primary"):
     st.subheader("Prediction Probabilities across Classes")
     prob_df = pd.DataFrame(prediction_proba, columns=list(wealth_labels.values()))
     st.bar_chart(prob_df.T)
-
